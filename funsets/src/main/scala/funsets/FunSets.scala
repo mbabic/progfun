@@ -74,18 +74,21 @@ object FunSets {
   /**
    * Returns whether there exists a bounded integer within `s`
    * that satisfies `p`.
+   * Idea behind implementation:
+   *   there exists x in s satisfying p <=> not all y in s are such that y
+   *   does not satisfy p
    */
   def exists(s: Set, p: Int => Boolean): Boolean = !forall(s, (x => !p(x)))
 
   /**
    * Returns a set transformed by applying `f` to each element of `s`.
    * Idea behind implementation:
-   * let s' be set to be returned.
-   * x in s' <=> there exists y in s such that y = f(x).  The logical expression
-   * is the idea behind the implementaiton given below.
+   *   let s' be set to be returned.
+   *   x in s' <=> there exists y in s such that x = f(y).  The logical expression
+   *   is the idea behind the implementaiton given below.
    */
   def map(s: Set, f: Int => Int): Set = 
-    (x => exists(s, (y => y == f(x))))
+    (x => exists(s, (y => x == f(y))))
 
   /**
    * Displays the contents of a set

@@ -33,6 +33,8 @@ class FunSetSuite extends FunSuite {
     val s1 = singletonSet(1)
     val s2 = singletonSet(2)
     val s3 = singletonSet(3)
+    val s4 = (x:Int) => (x > 2)
+
   }
 
   test("Singleton set tests.") {
@@ -66,7 +68,6 @@ class FunSetSuite extends FunSuite {
   
   test("Set intersection contains only common elements.") {
     new TestSets {
-      def s4 = (x:Int) => (x > 2)
       assert(!contains(intersect(s1, s4), 2), "Intersection should not " +
           "include elements not in either set")
       assert(!contains(intersect(s1, s4), 11), "Intersection should not " + 
@@ -76,7 +77,21 @@ class FunSetSuite extends FunSuite {
     }
   }
   
-  test("Set difference contains ") {
-    
+  test("`map` tests") {
+    new TestSets {
+    	val identMapSet = map(s1, x => x)
+    	assert(contains(identMapSet, 1), "map() using identity function " +
+    	    "should return set with element in original set.")
+    	assert(!contains(identMapSet, 4), "map() using identity function " +
+    	    "should return set with no elements which were not in original set.")
+    	    
+    	val squareMapSet = map(s2, x => x * x)
+    	assert(contains(squareMapSet, 4), "map() using squaring function " +
+    	    "should return set with element which is square of element in" +
+    	    "the original set.")
+    	assert(!contains(squareMapSet, 2), "map() using squaring function " +
+    	    "should return set with no elements which are not the square of " +
+    	    "an element in the original set")  	
+    }
   }
 }
