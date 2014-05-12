@@ -111,8 +111,7 @@ abstract class TweetSet {
 
 class Empty extends TweetSet {
 
-  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = ???
-
+  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = acc
 
   /**
    * The following methods are already implemented
@@ -129,12 +128,9 @@ class Empty extends TweetSet {
 
 class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
-  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = ???
-
-
-  /**
-   * The following methods are already implemented
-   */
+  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = 
+    if (p(elem)) left filterAcc (p, right filterAcc(p, acc incl elem))
+    else left filterAcc(p, right filterAcc(p, acc))
 
   def contains(x: Tweet): Boolean =
     if (x.text < elem.text) left.contains(x)
