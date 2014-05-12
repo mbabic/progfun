@@ -13,6 +13,19 @@ class Tweet(val user: String, val text: String, val retweets: Int) {
 }
 
 /**
+ * Container for static methods of the tweet class.
+ */
+object Tweet {
+  def maxRetweets(a: Tweet, b: Tweet): Tweet =
+    if (a.retweets < b.retweets) b
+    else a
+    
+  def minRetweets(a: Tweet, b: Tweet): Tweet =
+    if (a.retweets < b.retweets) a
+    else b
+}
+
+/**
  * This represents a set of objects of type `Tweet` in the form of a binary search
  * tree. Every branch in the tree has two children (two `TweetSet`s). There is an
  * invariant which always holds: for every branch `b`, all elements in the left
@@ -42,8 +55,15 @@ abstract class TweetSet {
   def filter(p: Tweet => Boolean): TweetSet = 
     filterAcc(p, new Empty)
     
+  /**
+   * Boolean flag indicating whether the TweetSet is empty or not.
+   */
   def isEmpty: Boolean
 
+  /**
+   * Returns the twe
+   */
+  
   /**
    * This is a helper method for `filter` that propagetes the accumulated tweets.
    */
@@ -56,25 +76,17 @@ abstract class TweetSet {
    
   /**
    * Returns the tweet from this set which has the greatest retweet count.
-   *
-   * Calling `mostRetweeted` on an empty set should throw an exception of
-   * type `java.util.NoSuchElementException`.
-   *
-   * Question: Should we implment this method here, or should it remain abstract
-   * and be implemented in the subclasses?
    */
-  def mostRetweeted: Tweet = ???
+  def mostRetweeted: Tweet
 
+  def descendingByRetweetAcc(acc: TweetList): TweetList
+  
   /**
    * Returns a list containing all tweets of this set, sorted by retweet count
    * in descending order. In other words, the head of the resulting list should
    * have the highest retweet count.
-   *
-   * Hint: the method `remove` on TweetSet will be very useful.
-   * Question: Should we implment this method here, or should it remain abstract
-   * and be implemented in the subclasses?
    */
-  def descendingByRetweet: TweetList = ???
+  def descendingByRetweet: TweetList = descendingByRetweetAcc(Nil)
 
 
   /**
@@ -107,12 +119,18 @@ abstract class TweetSet {
 
 class Empty extends TweetSet {
   
-  def isEmpty = true
+  val isEmpty = true
 
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = acc
 
   def union(that: TweetSet): TweetSet =
     that
+    
+  def mostRetweeted(): Tweet =
+  	throw new NoSuchElementException("No most retweeted tweet in empty tweet " +
+  	  "set")
+    
+  def descendingByRetweetAcc(acc: TweetList): TweetList = Nil  
   
   /**
    * The following methods are already implemented
@@ -129,7 +147,7 @@ class Empty extends TweetSet {
 
 class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
-  def isEmpty = false
+  val isEmpty = false
   
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = 
     if (p(elem)) left filterAcc (p, right filterAcc(p, acc incl elem))
@@ -139,6 +157,24 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
   def union(that: TweetSet): TweetSet = 
   	filterAcc(x => true, that)
 
+  def descendingByRetweetAcc(acc: objsets.TweetList): objsets.TweetList =
+  	new Cons(mostRetweeted, 
+  			(this remove mostRetweeted) descendingByRetweetAcc(acc))
+  
+  /**
+   * Idea behind implementation: the most retweeted tweet will be the max of
+   * the retweets of the elem of the given set, the most retweeted tweet in
+   * the left subtree and the most the retweeted tweet in the right subtree.
+   */
+  lazy val mostRetweeted: Tweet = {
+      // Only one tweet in the set, so it must necessarily be the one with the
+      // most retweets.
+      if ((left isEmpty) && (right isEmpty)) elem
+      else if (left isEmpty) Tweet.maxRetweets(right mostRetweeted, elem)
+      else if (right isEmpty) Tweet.maxRetweets(left mostRetweeted, elem)
+      else Tweet.maxRetweets(Tweet.maxRetweets(left mostRetweeted, right mostRetweeted), elem)
+  }
+  	
   def contains(x: Tweet): Boolean =
     if (x.text < elem.text) left.contains(x)
     else if (elem.text < x.text) right.contains(x)
