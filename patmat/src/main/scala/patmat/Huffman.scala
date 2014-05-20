@@ -54,21 +54,24 @@ object Huffman {
   def string2Chars(str: String): List[Char] = str.toList
 
   /**
-   * This function computes for each unique character in the list `chars` the number of
-   * times it occurs. For example, the invocation
+   * This function computes for each unique character in the list `chars` 
+   * the number of times it occurs. For example, the invocation
    *
    *   times(List('a', 'b', 'a'))
    *
-   * should return the following (the order of the resulting list is not important):
+   * should return the following (the order of the resulting list is not 
+   * important):
    *
    *   List(('a', 2), ('b', 1))
    *
-   * The type `List[(Char, Int)]` denotes a list of pairs, where each pair consists of a
-   * character and an integer. Pairs can be constructed easily using parentheses:
+   * The type `List[(Char, Int)]` denotes a list of pairs, where each pair
+   * consists of a character and an integer. Pairs can be constructed easily 
+   * using parentheses:
    *
    *   val pair: (Char, Int) = ('c', 1)
    *
-   * In order to access the two elements of a pair, you can use the accessors `_1` and `_2`:
+   * In order to access the two elements of a pair, you can use the accessors 
+   * `_1` and `_2`:
    *
    *   val theChar = pair._1
    *   val theInt  = pair._2
@@ -80,8 +83,28 @@ object Huffman {
    *       println("character is: "+ theChar)
    *       println("integer is  : "+ theInt)
    *   }
+   *   
+   * Implementation strategy: 
+   *   For each character 
    */
-  def times(chars: List[Char]): List[(Char, Int)] = ???
+  def times(chars: List[Char]): List[(Char, Int)] = {
+    def timesAcc(C: Char, list: List[(Char, Int)]): List[(Char, Int)] = list match {
+      // If list is empty, create new list and associate count for character C
+      // to 1.
+      case List() => List((C, 1))
+      // If character in the head element of the list is == C, then return
+      // a new list with the count associated with C incremented
+      case (C, count) :: xs => (C, count + 1) :: xs
+      // Else, x is not-empty and the head element in the list does not contain
+      // C, make recursive call on tail of list to look for instance of C in
+      // it.
+      case x :: xs => x :: timesAcc(C, xs)
+    }
+    chars match {
+      case List() => List()
+      case x :: xs => timesAcc(x, times(xs))
+    }
+  }
 
   /**
    * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
