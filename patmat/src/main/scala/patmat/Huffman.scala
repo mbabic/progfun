@@ -112,8 +112,26 @@ object Huffman {
    * The returned list should be ordered by ascending weights (i.e. the
    * head of the list should have the smallest weight), where the weight
    * of a leaf is the frequency of the character.
+   * Implementation idea:
+   *     Create leaf elements from freqs list as we see them and construct
+   *     sorted list by using insertion sort to insert each newly created
+   *     leaf element into the list to be returned.
+   *     Efficiency is not ideal, but good enough.
    */
-  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = ???
+  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = {
+    
+    def insert(pair: (Char, Int), leafList: List[Leaf]): List[Leaf] = leafList match {
+      case List() => List(Leaf(pair._1, pair._2))
+      case x :: xs => 
+        if (pair._2 <= weight(x)) Leaf(pair._1, pair._2) :: leafList
+        else x :: insert(pair, xs)
+    }
+    
+    freqs match {
+      case List() => List()
+      case x :: xs => insert(x, makeOrderedLeafList(xs))
+    }
+  }
 
   /**
    * Checks whether the list `trees` contains only one single code tree.
