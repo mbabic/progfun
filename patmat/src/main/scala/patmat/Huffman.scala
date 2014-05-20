@@ -149,8 +149,28 @@ object Huffman {
    *
    * If `trees` is a list of less than two elements, that list should be returned
    * unchanged.
+   * Implementation idea:
+   *     Very similar to what was done for makeOrderedLeafList.
    */
-  def combine(trees: List[CodeTree]): List[CodeTree] = ???
+  def combine(trees: List[CodeTree]): List[CodeTree] = {
+    
+    def insert(x1: CodeTree, x2: CodeTree, list: List[CodeTree]): List[CodeTree] = {
+      list match { 
+      	case List() => List(makeCodeTree(x1, x2))
+      	case x :: xs => 
+      	  if (weight(makeCodeTree(x1, x2)) <= weight(x)) 
+      	    makeCodeTree(x1, x2) :: list
+      	  else
+      		x :: insert(x1, x2, xs)
+      }
+    }
+    
+    trees match {
+      case List() => List()
+      case x :: List() => trees
+      case x1 :: x2 :: xs => insert(x1, x2, combine(xs))
+    }
+  }
 
   /**
    * This function will be called in the following way:
